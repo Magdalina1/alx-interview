@@ -2,37 +2,39 @@
 """ Module for solving prime game question """
 
 def isWinner(x, nums):
-    """function that checks for the winner"""
+    """Determine the winner of the prime game"""
     if not nums or x < 1:
         return None
-    
+
     max_num = max(nums)
-    my_filter = [True for _ in range(max(max_num + 1, 2))]
-    
-    # Implementing Sieve of Eratosthenes
+    if max_num < 2:
+        return None  # No prime numbers if max_num < 2
+
+    # Sieve of Eratosthenes to find all primes up to max_num
+    sieve = [True] * (max_num + 1)
+    sieve[0] = sieve[1] = False  # 0 and 1 are not primes
+
     for i in range(2, int(max_num ** 0.5) + 1):
-        if my_filter[i]:
+        if sieve[i]:
             for j in range(i * i, max_num + 1, i):
-                my_filter[j] = False
-    
-    my_filter[0] = my_filter[1] = False  # 0 and 1 are not primes
-    count_primes = 0
-    
-    # Counting cumulative primes up to each index
-    for i in range(len(my_filter)):
-        if my_filter[i]:
-            count_primes += 1
-        my_filter[i] = count_primes
-    
-    player1_wins = 0
-    
+                sieve[j] = False
+
+    # Cumulative count of primes up to each number
+    prime_counts = [0] * (max_num + 1)
+    for i in range(1, max_num + 1):
+        prime_counts[i] = prime_counts[i - 1] + (1 if sieve[i] else 0)
+
+    # Determine the number of rounds each player wins
+    maria_wins = 0
     for n in nums:
-        if my_filter[n] % 2 == 1:
-            player1_wins += 1
-    
-    if player1_wins * 2 == len(nums):
-        return None
-    elif player1_wins * 2 > len(nums):
+        if prime_counts[n] % 2 == 1:
+            maria_wins += 1
+
+    ben_wins = x - maria_wins
+
+    if maria_wins > ben_wins:
         return "Maria"
-    else:
+    elif ben_wins > maria_wins:
         return "Ben"
+    else:
+        return None
