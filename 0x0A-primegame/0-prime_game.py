@@ -5,7 +5,6 @@ def isWinner(x, nums):
     if not nums or x < 1:
         return None
 
-    # The maximum value in nums to set the sieve upper bound
     max_num = max(nums)
     if max_num < 2:
         return None  # No prime numbers if max_num < 2
