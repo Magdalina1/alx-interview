@@ -1,44 +1,47 @@
 #!/usr/bin/python3
+""" Prime Game """
+
+
+def is_prime(n):
+    """ Check if n is a prime number """
+    for i in range(2, int(n ** 0.5) + 1):
+        if not n % i:
+            return False
+    return True
+
+
+def add_prime(n, primes):
+    """ Add prime to list """
+    last_prime = primes[-1]
+    if n > last_prime:
+        for i in range(last_prime + 1, n + 1):
+            if is_prime(i):
+                primes.append(i)
+            else:
+                primes.append(0)
+
 
 def isWinner(x, nums):
-    """Determine the winner of the prime game"""
-    if not nums or x < 1:
-        return None
+    """ x is the number of rounds and nums is an array of n
+    Return: name of the player that won the most rounds
+    If the winner cannot be determined, return None """
+    score = {"Maria": 0, "Ben": 0}
+    primes = [0, 0, 2]
+    add_prime(max(nums), primes)
 
-    max_num = max(nums)
-    if max_num < 2:
-        return None  # No prime numbers if max_num < 2
+    for round in range(x):
+        _sum = sum((i != 0 and i <= nums[round])
+                   for i in primes[:nums[round] + 1])
+        if (_sum % 2):
+            winner = "Maria"
+        else:
+            winner = "Ben"
+        if winner:
+            score[winner] += 1
 
-    # Sieve of Eratosthenes to find all primes up to max_num
-    sieve = [True] * (max_num + 1)
-    sieve[0] = sieve[1] = False  # 0 and 1 are not primes
-
-    # Generate prime numbers up to max_num
-    for i in range(2, int(max_num ** 0.5) + 1):
-        if sieve[i]:
-            for j in range(i * i, max_num + 1, i):
-                sieve[j] = False
-
-    # Cumulative count of primes up to each number
-    prime_counts = [0] * (max_num + 1)
-    for i in range(1, max_num + 1):
-        prime_counts[i] = prime_counts[i - 1] + (1 if sieve[i] else 0)
-
-    # Determine the number of rounds each player wins
-    maria_wins = 0
-    for n in nums:
-        if prime_counts[n] % 2 == 1:
-            maria_wins += 1
-
-    ben_wins = x - maria_wins
-
-    if maria_wins > ben_wins:
+    if score["Maria"] > score["Ben"]:
         return "Maria"
-    elif ben_wins > maria_wins:
+    elif score["Ben"] > score["Maria"]:
         return "Ben"
-    else:
-        return None
 
-# Example usage
-if __name__ == "__main__":
-    print("Winner:", isWinner(5, [2, 5, 1, 4, 3]))  # Expected output: "Ben"
+    return None
